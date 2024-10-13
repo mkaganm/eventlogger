@@ -1,25 +1,56 @@
 package main
 
 import (
-  "fmt"
+	"commonlogger/internal/clients/mongo"
+	"fmt"
+	"log"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
-//TIP To run your code, right-click the code and select <b>Run</b>. Alternatively, click
-// the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.
-
 func main() {
-  //TIP Press <shortcut actionId="ShowIntentionActions"/> when your caret is at the underlined or highlighted text
-  // to see how GoLand suggests fixing it.
-  s := "gopher"
-  fmt.Println("Hello and welcome, %s!", s)
+	// Create a new MongoDB client and connect to the 'testdb' database
+	client, err := mongo.NewClient("testdb")
+	if err != nil {
+		log.Fatalf("Error connecting to MongoDB: %v", err)
+	}
+	defer func() {
+		// Close the MongoDB connection
+		if err := client.Close(); err != nil {
+			log.Fatalf("Error closing MongoDB connection: %v", err)
+		}
+	}()
 
-  for i := 1; i <= 5; i++ {
-	//TIP You can try debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-	// for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>. To start your debugging session, 
-	// right-click your code in the editor and select the <b>Debug</b> option. 
-	fmt.Println("i =", 100/i)
-  }
+	// Insert a new document into the 'users' collection
+	doc := bson.M{
+		"_id":  "12345",
+		"name": "John Doe",
+		"age":  30,
+	}
+	if err := client.InsertDocument("users", doc); err != nil {
+		log.Fatalf("Error inserting document: %v", err)
+	}
+	fmt.Println("Document successfully inserted!")
+
+	// Retrieve the inserted document by its ID
+	retrievedDoc, err := client.GetDocument("users", "12345")
+	if err != nil {
+		log.Fatalf("Error retrieving document: %v", err)
+	}
+	fmt.Printf("Retrieved document: %v\n", retrievedDoc)
+
+	// Update the document by its ID
+	update := bson.M{
+		"age": 31,
+	}
+	if err := client.UpdateDocument("users", "12345", update); err != nil {
+		log.Fatalf("Error updating document: %v", err)
+	}
+	fmt.Println("Document successfully updated!")
+
+	// Delete the document by its ID
+	if err := client.DeleteDocument("users", "12345"); err != nil {
+		log.Fatalf("Error deleting document: %v", err)
+	}
+	fmt.Println("Document successfully deleted!")
 }
-
-//TIP See GoLand help at <a href="https://www.jetbrains.com/help/go/">jetbrains.com/help/go/</a>.
-// Also, you can try interactive lessons for GoLand by selecting 'Help | Learn IDE Features' from the main menu.
