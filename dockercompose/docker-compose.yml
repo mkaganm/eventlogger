@@ -23,7 +23,6 @@ services:
     networks:
       - shared_network
 
-  # MongoDB service (Replaces Couchbase)
   mongo_db:
     image: mongo:latest
     container_name: mongo_db
