@@ -19,6 +19,9 @@ RUN go build -o /app/main .
 # Step 2: Create a lightweight container for running the Go application
 FROM alpine:latest
 
+# Install bash to use it in CMD for .env sourcing
+RUN apk add --no-cache bash
+
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -31,5 +34,5 @@ COPY .env .env
 # Expose port (optional, if your app exposes a port)
 EXPOSE 8080
 
-# Command to run the executable
-CMD ["./main"]
+# Command to run the executable, sourcing the .env file
+CMD ["bash", "-c", "source .env && ./main"]
