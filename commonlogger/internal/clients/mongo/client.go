@@ -1,11 +1,13 @@
 package mongo
 
 import (
+	"commonlogger/internal/constants"
 	"context"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"os"
 )
 
 // Client struct: Structure to manage MongoDB connection and basic operations.
@@ -17,7 +19,7 @@ type Client struct {
 // NewClient Creates a new MongoClient and connects to MongoDB.
 func NewClient(databaseName string) (*Client, error) {
 	// DSN connection string (username, password, host, port)
-	dsn := "mongodb://admin:admin@mongo_db:27017/?connect=direct"
+	dsn := os.Getenv(constants.MONGO_DSN_URL)
 
 	// Set MongoDB client options
 	clientOptions := options.Client().ApplyURI(dsn)
